@@ -4,26 +4,22 @@ const jwt = require('jsonwebtoken');
 
 const login = async (req, res) => {
     const { username, password } = req.body;
-    if (!username || !password)
-        return res
-            .status(400)
-            .send({ error: "Please provide both email and password!!" });
     try {
-        const user = await User.findOne({ username: username });
-        if (user) {
-            const isMatch = bcrypt.compareSync(password, user.password);
-            if (isMatch) {
-                const token = jwt.sign({ id: user.id, role: user.role } , "elvis", { expiresIn: "1h" });
-                const { password, ...others } = user._doc;
-                return res.json({ "token": token, "user": others }).status(200);
-            } else {
-                res.status(400).json({ message: "Invalid Password" });
-            }
+        const user = await User.findOne({ username });
+        if (!user) return res.status(404).send({ message: `User ${username} does not exist` });
+
+        const passwordMatch = bcrypt.compareSync(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).send({ message: "Invalid password" });
+        } else {
+            const token = jwt.sign({ user: { id: user.id, role: user.role } }, "elvis", { expiresIn: "1h" });
+
+            return res.send({ "message": `Hi, ${user.username}. Logged in successfully. Use the token below to send requests :)`, "token": token }).status(201);
         }
     } catch (error) {
         console.log(error.message);
-        res.json(error).status(500);
+        return res.status(500).send({ message: error.message });
     }
-};
+}
 
 module.exports = { login };

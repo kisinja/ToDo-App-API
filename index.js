@@ -32,7 +32,7 @@ start_server();
 
 app.use("/auth", authRouter);
 app.use("/users", verifyTokenAndAdmin, userRouter);
-app.use("/tasks", verifyTokenAndAuthorization, taskRouter);
+app.use("/tasks", verifyTokenAndAdmin, taskRouter);
 
 app.get("/", (req, res) => {
     res.send("Welcome").status(200);

@@ -13,7 +13,7 @@ const verifyToken = (req, res, next) => {
             return res.status(401).send({ message: "Invalid token" });
         }
     }
-}
+};
 
 const verifyTokenAndAuthorization = (req, res, next) => {
     verifyToken(req, res, () => {
@@ -23,14 +23,14 @@ const verifyTokenAndAuthorization = (req, res, next) => {
             res.status(403).send("You are not allowed to do that :(");
         }
     });
-}
+};
 
 const verifyTokenAndAdmin = (req, res, next) => {
     verifyToken(req, res, () => {
         if (req.user.role === "admin") {
             next();
         } else {
-            res.status(403).json("You are not allowed to do that");
+            res.status(403).send("You are not allowed to do that :(");
         }
     });
 };
